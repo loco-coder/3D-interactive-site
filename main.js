@@ -1,86 +1,112 @@
-// Main setup for Three.js scene
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive 3D Model Viewer</title>
+    <style>
+      body, html {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Load necessary libraries from CDNs -->
+    <script src="https://cdn.jsdelivr.net/npm/three/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cannon-es@0.18.0/dist/cannon-es.js"></script>
 
-// Basic lighting
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-scene.add(ambientLight);
-const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-directionalLight.position.set(5, 5, 5);
-scene.add(directionalLight);
+    <script>
+      // Set up Three.js scene, camera, and renderer
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
 
-// Ground plane
-const planeGeometry = new THREE.PlaneGeometry(100, 100);
-const planeMaterial = new THREE.MeshStandardMaterial({ color: 0xdddddd });
-const ground = new THREE.Mesh(planeGeometry, planeMaterial);
-ground.rotation.x = - Math.PI / 2;
-ground.receiveShadow = true;
-scene.add(ground);
+      // Add lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+      scene.add(ambientLight);
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+      directionalLight.position.set(5, 5, 5);
+      scene.add(directionalLight);
 
-// Camera settings
-camera.position.set(0, 2, 10);
+      // Create ground plane
+      const planeGeometry = new THREE.PlaneGeometry(100, 100);
+      const planeMaterial = new THREE.MeshStandardMaterial({ color: 0xdddddd });
+      const ground = new THREE.Mesh(planeGeometry, planeMaterial);
+      ground.rotation.x = -Math.PI / 2;
+      scene.add(ground);
 
-// Orbit Controls for mouse interaction
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.25;
-controls.enableZoom = true;
+      // Orbit Controls
+      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.25;
+      controls.enableZoom = true;
 
-// Load a car model
-const loader = new THREE.GLTFLoader();
-loader.load('models/car.glb', function(gltf) {
-  const car = gltf.scene;
-  car.position.set(0, 0, 0);
-  car.scale.set(1, 1, 1);
-  scene.add(car);
-}, undefined, function(error) {
-  console.error('Error loading the model:', error);
-});
+      // Load 3D model (e.g., car.glb)
+      const loader = new THREE.GLTFLoader();
+      loader.load('models/car.glb', function(gltf) {
+        const car = gltf.scene;
+        car.position.set(0, 0.5, 0);  // Adjust position
+        car.scale.set(1, 1, 1);  // Adjust scale
+        scene.add(car);
+      }, undefined, function(error) {
+        console.error('Error loading the model:', error);
+      });
 
-// Physics engine (Cannon.js)
-const world = new CANNON.World();
-world.gravity.set(0, -9.82, 0);  // Set gravity
+      // Cannon.js physics setup
+      const world = new CANNON.World();
+      world.gravity.set(0, -9.82, 0);  // Gravity strength and direction
 
-// Create car physics body
-const carBody = new CANNON.Body({
-  mass: 1,
-  shape: new CANNON.Box(new CANNON.Vec3(1, 1, 1)),  // Simple box shape
-});
-carBody.position.set(0, 0, 0);
-world.addBody(carBody);
+      // Car physics body
+      const carBody = new CANNON.Body({
+        mass: 1,  // Car has mass
+        shape: new CANNON.Box(new CANNON.Vec3(1, 1, 1)),  // Box shape
+      });
+      carBody.position.set(0, 0.5, 0);
+      world.addBody(carBody);
 
-// Ground physics
-const groundBody = new CANNON.Body({
-  mass: 0,  // Static object
-  shape: new CANNON.Plane(),
-});
-groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);  // Align with ground
-world.addBody(groundBody);
+      // Ground physics body
+      const groundBody = new CANNON.Body({
+        mass: 0,  // Ground doesn't move
+        shape: new CANNON.Plane(),
+      });
+      groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
+      world.addBody(groundBody);
 
-// Physics and rendering loop
-function animate() {
-  requestAnimationFrame(animate);
+      // Physics update
+      function updatePhysics() {
+        world.step(1 / 60);  // Step physics world forward at 60 FPS
 
-  // Update physics
-  world.step(1 / 60);  // 60 times per second
+        // Sync Three.js car position with Cannon.js carBody position
+        if (scene.children[2]) {
+          scene.children[2].position.copy(carBody.position);
+          scene.children[2].quaternion.copy(carBody.quaternion);
+        }
+      }
 
-  // Sync Three.js car position with physics
-  if (scene.children[2]) {  // Assuming the car is the 3rd child
-    scene.children[2].position.copy(carBody.position);
-    scene.children[2].quaternion.copy(carBody.quaternion);
-  }
+      // Animation loop
+      function animate() {
+        requestAnimationFrame(animate);
+        updatePhysics();  // Update physics
+        controls.update();  // Update OrbitControls
+        renderer.render(scene, camera);  // Render scene
+      }
+      animate();
 
-  controls.update();  // Update OrbitControls
-  renderer.render(scene, camera);  // Render the scene
-}
-animate();
-
-// Handle window resize
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
+      // Handle window resize
+      window.addEventListener('resize', function() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    </script>
+  </body>
+</html>
