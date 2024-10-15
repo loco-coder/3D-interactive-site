@@ -52,7 +52,7 @@
 
       // Load 3D model (e.g., car.glb)
       const loader = new THREE.GLTFLoader();
-      loader.load('models/car.glb', function(gltf) {
+      loader.load('models/car.gltf', function(gltf) {
         const car = gltf.scene;
         car.position.set(0, 0.5, 0);  // Adjust position
         car.scale.set(1, 1, 1);  // Adjust scale
