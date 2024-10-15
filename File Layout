@@ -1,0 +1,15 @@
+interactive-3D-site/
+│
+├── index.html         # Main HTML file
+├── style.css          # Optional: Add custom styles
+├── js/
+│   ├── main.js        # JavaScript file for Three.js scene
+│   ├── controls.js    # OrbitControls setup
+│   └── physics.js     # Physics setup (Cannon.js)
+├── models/
+│   └── car.glb        # 3D model files (car, objects, etc.)
+└── lib/
+    ├── three.min.js   # Three.js library
+    ├── GLTFLoader.js  # GLTF Loader
+    ├── OrbitControls.js # Orbit Controls for mouse interaction
+    └── cannon.min.js  # Physics engine (Cannon.js)
