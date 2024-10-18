@@ -1,0 +1,6 @@
+interactive-3D-site/
+│
+├── index.html         # Main HTML file (contains all the code and library links)
+├── models/
+│   └── car.glb        # Your 3D model (example car model)
+└── README.md          # Optional: Project information
