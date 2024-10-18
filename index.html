@@ -50,9 +50,9 @@
       controls.dampingFactor = 0.25;
       controls.enableZoom = true;
 
-      // Load 3D model (e.g., car.glb)
+      // Load 3D model (e.g., car.gltf)
       const loader = new THREE.GLTFLoader();
-      loader.load('models/car.glb', function(gltf) {
+      loader.load('model/car.gltf', function(gltf) {
         const car = gltf.scene;
         car.position.set(0, 0.5, 0);  // Adjust position
         car.scale.set(1, 1, 1);  // Adjust scale
