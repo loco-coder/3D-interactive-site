@@ -50,13 +50,13 @@
       controls.dampingFactor = 0.25;
       controls.enableZoom = true;
 
-      // Load 3D model (e.g., car.gltf)
+      // Load 3D model (e.g., scene.gltf)
       const loader = new THREE.GLTFLoader();
-      loader.load('model/car.gltf', function(gltf) {
-        const car = gltf.scene;
-        car.position.set(0, 0.5, 0);  // Adjust position
-        car.scale.set(1, 1, 1);  // Adjust scale
-        scene.add(car);
+      loader.load('model/scene.gltf', function(gltf) {
+        const scene = gltf.scene;
+        scene.position.set(0, 0.5, 0);  // Adjust position
+        scene.scale.set(1, 1, 1);  // Adjust scale
+        scene.add(scene);
       }, undefined, function(error) {
         console.error('Error loading the model:', error);
       });
@@ -65,13 +65,13 @@
       const world = new CANNON.World();
       world.gravity.set(0, -9.82, 0);  // Gravity strength and direction
 
-      // Car physics body
-      const carBody = new CANNON.Body({
-        mass: 1,  // Car has mass
+      // scene physics body
+      const sceneBody = new CANNON.Body({
+        mass: 1,  // scene has mass
         shape: new CANNON.Box(new CANNON.Vec3(1, 1, 1)),  // Box shape
       });
-      carBody.position.set(0, 0.5, 0);
-      world.addBody(carBody);
+      sceneBody.position.set(0, 0.5, 0);
+      world.addBody(sceneBody);
 
       // Ground physics body
       const groundBody = new CANNON.Body({
@@ -85,10 +85,10 @@
       function updatePhysics() {
         world.step(1 / 60);  // Step physics world forward at 60 FPS
 
-        // Sync Three.js car position with Cannon.js carBody position
+        // Sync Three.js scene position with Cannon.js sceneBody position
         if (scene.children[2]) {
-          scene.children[2].position.copy(carBody.position);
-          scene.children[2].quaternion.copy(carBody.quaternion);
+          scene.children[2].position.copy(sceneBody.position);
+          scene.children[2].quaternion.copy(sceneBody.quaternion);
         }
       }
 
