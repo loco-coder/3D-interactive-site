@@ -52,7 +52,7 @@
 
       // Load 3D model (e.g., scene.gltf)
       const loader = new THREE.GLTFLoader();
-      loader.load('model/scene.gltf', function(gltf) {
+      loader.load('models/scene.gltf', function(gltf) {
         const scene = gltf.scene;
         scene.position.set(0, 0.5, 0);  // Adjust position
         scene.scale.set(1, 1, 1);  // Adjust scale
