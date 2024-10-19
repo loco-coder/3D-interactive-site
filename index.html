@@ -5,14 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive 3D Model Viewer</title>
     <style>
-      body, html {
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-      }
-      canvas {
-        display: block;
-      }
+      body, html { margin: 0; padding: 0; overflow: hidden; }
+      canvas { display: block; }
     </style>
   </head>
   <body>
@@ -20,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/three/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three/examples/js/loaders/GLTFLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/cannon-es@0.18.0/dist/cannon-es.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cannon@0.6.2/build/cannon.min.js"></script>
 
     <script>
       // Set up Three.js scene, camera, and renderer
@@ -50,13 +44,13 @@
       controls.dampingFactor = 0.25;
       controls.enableZoom = true;
 
-      // Load 3D model (e.g., scene.gltf)
+      // Load 3D model (model.gltf)
       const loader = new THREE.GLTFLoader();
-      loader.load('models/scene.gltf', function(gltf) {
-        const scene = gltf.scene;
-        scene.position.set(0, 0.5, 0);  // Adjust position
-        scene.scale.set(1, 1, 1);  // Adjust scale
-        scene.add(scene);
+      loader.load('models/model.gltf', function(gltf) {
+        const model = gltf.scene;
+        model.position.set(0, 0.5, 0);  // Adjust position
+        model.scale.set(1, 1, 1);  // Adjust scale
+        scene.add(model);
       }, undefined, function(error) {
         console.error('Error loading the model:', error);
       });
@@ -65,13 +59,13 @@
       const world = new CANNON.World();
       world.gravity.set(0, -9.82, 0);  // Gravity strength and direction
 
-      // scene physics body
-      const sceneBody = new CANNON.Body({
-        mass: 1,  // scene has mass
+      // Model physics body
+      const modelBody = new CANNON.Body({
+        mass: 1,  // Model has mass
         shape: new CANNON.Box(new CANNON.Vec3(1, 1, 1)),  // Box shape
       });
-      sceneBody.position.set(0, 0.5, 0);
-      world.addBody(sceneBody);
+      modelBody.position.set(0, 0.5, 0);
+      world.addBody(modelBody);
 
       // Ground physics body
       const groundBody = new CANNON.Body({
@@ -85,10 +79,10 @@
       function updatePhysics() {
         world.step(1 / 60);  // Step physics world forward at 60 FPS
 
-        // Sync Three.js scene position with Cannon.js sceneBody position
+        // Sync Three.js model position with Cannon.js modelBody position
         if (scene.children[2]) {
-          scene.children[2].position.copy(sceneBody.position);
-          scene.children[2].quaternion.copy(sceneBody.quaternion);
+          scene.children[2].position.copy(modelBody.position);
+          scene.children[2].quaternion.copy(modelBody.quaternion);
         }
       }
 
