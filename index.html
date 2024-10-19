@@ -11,9 +11,11 @@
   </head>
   <body>
     <!-- Load necessary libraries from CDNs -->
-    <script src="https://cdn.jsdelivr.net/npm/three/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three/examples/js/loaders/GLTFLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three/examples/js/controls/OrbitControls.js"></script>
+  <script type="module">
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.150.0/build/three.module.js';
+    import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three/examples/jsm/loaders/GLTFLoader.js';
+    import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three/examples/jsm/controls/OrbitControls.js';
+  </script>
     <script src="https://cdn.jsdelivr.net/npm/cannon@0.6.2/build/cannon.min.js"></script>
 
     <script>
