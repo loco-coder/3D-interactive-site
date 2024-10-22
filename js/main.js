@@ -37,9 +37,6 @@ loader.load('models/car.glb', function(gltf) {
     }
   });
   scene.add(model);
-}, undefined, function(error) {
-  console.error('An error occurred loading the model:', error);
-});
 
 
   
