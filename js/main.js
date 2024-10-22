@@ -1,8 +1,3 @@
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import * as CANNON from 'cannon-es';
-
 // Scene, Camera, Renderer
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -33,7 +28,7 @@ scene.add(groundMesh);
 
 // Load Car Model
 let carMesh, carBody;
-const loader = new GLTFLoader();
+const loader = new THREE.GLTFLoader();
 loader.load('models/car.glb', function(gltf) {
   carMesh = gltf.scene;
   carMesh.scale.set(1, 1, 1);
@@ -49,7 +44,7 @@ loader.load('models/car.glb', function(gltf) {
 });
 
 // Controls
-const controls = new OrbitControls(camera, renderer.domElement);
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.2;
 camera.position.set(0, 3, 10);
