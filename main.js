@@ -1,17 +1,6 @@
-<script type="importmap">
-			{
-				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/"
-				}
-			}
-		</script>
-
-		<script type="module">
-  
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './vendor/three/build/three.module.js';
+import { GLTFLoader } from './vendor/three/examples/jsm/loaders/GLTFLoader.js';
+import { OrbitControls } from './vendor/three/examples/jsm/controls/OrbitControls.js';
 
 // Set up the scene, camera, and renderer
 const scene = new THREE.Scene();
