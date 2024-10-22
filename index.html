@@ -3,11 +3,15 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive 3D Model Viewer</title>
+    <title>3D Car Simulation</title>
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
     <canvas id="canvas"></canvas>
-    <script src="main.js" type="module"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cannon-es@0.18.0/dist/cannon-es.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three/examples/jsm/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three/examples/jsm/controls/OrbitControls.js"></script>
+    <script src="js/main.js"></script>
   </body>
 </html>
