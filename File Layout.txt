@@ -1,6 +1,8 @@
-interactive-3D-site/
+car-website/
 │
-├── index.html         # Main HTML file (contains all the code and library links)
-├── models/
-│   └── car.glb        # Your 3D model (example car model)
-└── README.md          # Optional: Project information
+├── index.html           # Main HTML file
+├── style.css            # Optional CSS for styling
+├── js/
+│   └── main.js          # JavaScript file for Three.js, Cannon.js, and logic
+└── models/
+    └── car.glb          # Car 3D model (GLTF format)
