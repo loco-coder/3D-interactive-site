@@ -31,7 +31,7 @@ controls.enableZoom = true;
 
 // Load GLTF model
 const loader = new GLTFLoader();
-loader.load('models/model.gltf', function(gltf) {
+loader.load('models/model.glb', function ( gltf ) {
   const model = gltf.scene;
   model.position.set(0, 0.5, 0);
   model.scale.set(1, 1, 1);
