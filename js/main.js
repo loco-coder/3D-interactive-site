@@ -27,13 +27,22 @@ groundMesh.rotation.x = -Math.PI / 2;
 scene.add(groundMesh);
 
 // Load Car Model
-let carMesh, carBody;
 const loader = new THREE.GLTFLoader();
 loader.load('models/car.glb', function(gltf) {
-  carMesh = gltf.scene;
-  carMesh.scale.set(1, 1, 1);
-  scene.add(carMesh);
+  const model = gltf.scene;
+  model.traverse(function(node) {
+    if (node.isMesh) {
+      // Ignore any material errors by assigning a basic material
+      node.material = new THREE.MeshStandardMaterial({ color: 0x808080 });
+    }
+  });
+  scene.add(model);
+}, undefined, function(error) {
+  console.error('An error occurred loading the model:', error);
+});
 
+
+  
   // Car Physics Body
   const carShape = new CANNON.Box(new CANNON.Vec3(1, 0.5, 2)); // Approx car shape
   carBody = new CANNON.Body({ mass: 1500, shape: carShape });
