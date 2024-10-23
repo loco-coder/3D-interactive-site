@@ -32,7 +32,7 @@ scene.add(groundMesh);
 async function loadModels() {
     try {
         const modelFiles = await fetchFilesFromGitHub('https://github.com/loco-coder/3D-interactive-site/tree/d6c56c14eb843a1094dc8362376ab0b03c63eaca/models', '.glb');
-        const textureFiles = await fetchFilesFromGitHub(texturesURL, '.png');
+        const textureFiles = await fetchFilesFromGitHub('https://github.com/loco-coder/3D-interactive-site/tree/2d8ab73aa6c0777e511743e14a2917fc69300ab3/textures', '.png');
 
         modelFiles.forEach((modelFile) => {
             loader.load(`${modelsURL}${modelFile}`, function (gltf) {
