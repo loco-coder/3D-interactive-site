@@ -32,7 +32,7 @@ scene.add(groundMesh);
 // Load Car Model
 let carMesh = null, carBody = null;
 const loader = new THREE.GLTFLoader();
-loader.load('models/CAR.glb', function(gltf) {
+loader.load('models/car.glb', function(gltf) {
   carMesh = gltf.scene;
 
   // Traverse the model and replace textures with a basic material
