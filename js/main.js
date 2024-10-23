@@ -35,7 +35,7 @@ const loader = new THREE.GLTFLoader();
 loader.load('models/car.glb', function(gltf) {
   carMesh = gltf.scene;
 
-  // Replace missing textures with a basic material
+  // Traverse the model and replace textures with a basic material
   carMesh.traverse(function(node) {
     if (node.isMesh) {
       node.material = new THREE.MeshStandardMaterial({ color: 0x808080 });
