@@ -29,30 +29,37 @@ const groundMesh = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.M
 groundMesh.rotation.x = -Math.PI / 2;
 scene.add(groundMesh);
 
-// Load Car Model
-let carMesh = null, carBody = null;
-const loader = new THREE.GLTFLoader();
-loader.load('models/car.glb', function(gltf) {
-  carMesh = gltf.scene;
+async function loadModels() {
+    try {
+        const modelFiles = await fetchFilesFromGitHub(modelsURL, '.glb');
+        const textureFiles = await fetchFilesFromGitHub(texturesURL, '.png');
 
-  // Traverse the model and replace textures with a basic material
-  carMesh.traverse(function(node) {
-    if (node.isMesh) {
-      node.material = new THREE.MeshStandardMaterial({ color: 0x808080 });
+        modelFiles.forEach((modelFile) => {
+            loader.load(`${modelsURL}${modelFile}`, function (gltf) {
+                const model = gltf.scene;
+                
+                model.traverse(function (node) {
+                    if (node.isMesh) {
+                        const randomTexture = textureFiles[Math.floor(Math.random() * textureFiles.length)];
+                        node.material = new THREE.MeshStandardMaterial({ map: textureLoader.load(`${texturesURL}${randomTexture}`) });
+                    }
+                });
+
+                // Add to scene
+                scene.add(model);
+
+                // Add car physics (you can specify which model should have physics if needed)
+                const carShape = new CANNON.Box(new CANNON.Vec3(1, 0.5, 2)); // Approximate car shape
+                const carBody = new CANNON.Body({ mass: 1500, shape: carShape });
+                carBody.position.set(0, 0.5, 0);  // Adjust position as needed
+                world.addBody(carBody);
+
+            });
+        });
+    } catch (error) {
+        console.error('Error loading models or textures:', error);
     }
-  });
-
-  carMesh.scale.set(1, 1, 1);
-  scene.add(carMesh);
-
-  // Car Physics Body
-  const carShape = new CANNON.Box(new CANNON.Vec3(1, 0.5, 2)); // Approx car shape
-  carBody = new CANNON.Body({ mass: 1500, shape: carShape });
-  carBody.position.set(0, 0.5, 0);
-  world.addBody(carBody);
-}, undefined, function(error) {
-  console.error('An error occurred loading the model:', error);
-});
+}
 
 // Controls (initialize after camera)
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
