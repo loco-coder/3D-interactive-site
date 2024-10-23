@@ -25,7 +25,7 @@ const groundBody = new CANNON.Body({ mass: 0, shape: groundShape });
 groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0); // Rotate to horizontal
 world.addBody(groundBody);
 
-const groundMesh = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.MeshStandardMaterial({ color: 0x777777 }));
+const groundMesh = new THREE.Mesh(new THREE.PlaneGeometry(1000, 1000), new THREE.MeshStandardMaterial({ color: 0x0032ff }));
 groundMesh.rotation.x = -Math.PI / 2;
 scene.add(groundMesh);
 
@@ -36,11 +36,11 @@ loader.load('models/car.glb', function(gltf) {
   carMesh = gltf.scene;
 
   // Traverse the model and replace textures with a basic material
-  carMesh.traverse(function(node) {
-    if (node.isMesh) {
-      node.material = new THREE.MeshStandardMaterial({ color: 0x808080 });
-    }
-  });
+ // carMesh.traverse(function(node) {
+   // if (node.isMesh) {
+     // node.material = new THREE.MeshStandardMaterial({ color: 0x808080 });
+    //}
+  //});
 
   carMesh.scale.set(1, 1, 1);
   scene.add(carMesh);
