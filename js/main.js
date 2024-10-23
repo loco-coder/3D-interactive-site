@@ -1,5 +1,6 @@
-// Add the keys object to track user input
+// Initialize keys object for controls
 const keys = { forward: false, backward: false, left: false, right: false };
+
 // Scene, Camera, Renderer
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -28,17 +29,24 @@ const groundMesh = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.M
 groundMesh.rotation.x = -Math.PI / 2;
 scene.add(groundMesh);
 
-// Initialize carMesh and carBody at the top
+// Load Car Model
 let carMesh = null, carBody = null;
-
 const loader = new THREE.GLTFLoader();
 loader.load('models/car.glb', function(gltf) {
   carMesh = gltf.scene;
+
+  // Replace missing textures with a basic material
+  carMesh.traverse(function(node) {
+    if (node.isMesh) {
+      node.material = new THREE.MeshStandardMaterial({ color: 0x808080 });
+    }
+  });
+
   carMesh.scale.set(1, 1, 1);
   scene.add(carMesh);
 
-  // Create physics body for the car
-  const carShape = new CANNON.Box(new CANNON.Vec3(1, 0.5, 2));
+  // Car Physics Body
+  const carShape = new CANNON.Box(new CANNON.Vec3(1, 0.5, 2)); // Approx car shape
   carBody = new CANNON.Body({ mass: 1500, shape: carShape });
   carBody.position.set(0, 0.5, 0);
   world.addBody(carBody);
@@ -46,7 +54,32 @@ loader.load('models/car.glb', function(gltf) {
   console.error('An error occurred loading the model:', error);
 });
 
-// Animation Loop
+// Controls (initialize after camera)
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.2;
+camera.position.set(0, 3, 10);
+
+// Keyboard Controls
+document.addEventListener('keydown', (event) => {
+  switch (event.code) {
+    case 'ArrowUp': keys.forward = true; break;
+    case 'ArrowDown': keys.backward = true; break;
+    case 'ArrowLeft': keys.left = true; break;
+    case 'ArrowRight': keys.right = true; break;
+  }
+});
+
+document.addEventListener('keyup', (event) => {
+  switch (event.code) {
+    case 'ArrowUp': keys.forward = false; break;
+    case 'ArrowDown': keys.backward = false; break;
+    case 'ArrowLeft': keys.left = false; break;
+    case 'ArrowRight': keys.right = false; break;
+  }
+});
+
+// Update Physics and Render Loop
 function animate() {
   requestAnimationFrame(animate);
 
@@ -55,15 +88,15 @@ function animate() {
     const force = 500;
     if (keys.forward) carBody.applyForce(new CANNON.Vec3(0, 0, -force), carBody.position);
     if (keys.backward) carBody.applyForce(new CANNON.Vec3(0, 0, force), carBody.position);
-    if (keys.left) carBody.angularVelocity.set(0, 5, 0);
-    if (keys.right) carBody.angularVelocity.set(0, -5, 0);
+    if (keys.left) carBody.angularVelocity.set(0, 5, 0); // Turn left
+    if (keys.right) carBody.angularVelocity.set(0, -5, 0); // Turn right
 
     carMesh.position.copy(carBody.position);
     carMesh.quaternion.copy(carBody.quaternion);
   }
 
-  world.step(1 / 60); // Update physics
-  controls.update();  // Update controls
+  world.step(1 / 60);  // Update physics
+  controls.update();   // Update controls
   renderer.render(scene, camera);  // Render scene
 }
 animate();
