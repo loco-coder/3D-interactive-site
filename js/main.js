@@ -1,66 +1,64 @@
-// Initialize keys object for controls
-const keys = { forward: false, backward: false, left: false, right: false };
-
-// Scene, Camera, Renderer
+// Set up scene, renderer, and isometric camera
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const aspect = window.innerWidth / window.innerHeight;
+const camera = new THREE.OrthographicCamera(-5 * aspect, 5 * aspect, 5, -5, 0.1, 100);
+camera.position.set(10, 10, 10);  // Position for isometric view
+camera.lookAt(0, 0, 0);
+
 const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#canvas') });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// Lighting
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-scene.add(ambientLight);
+// Lighting setup
 const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-directionalLight.position.set(5, 5, 5);
+directionalLight.position.set(10, 10, 10);
 scene.add(directionalLight);
 
-// Physics World
+// Cannon.js physics setup
 const world = new CANNON.World();
-world.gravity.set(0, -9.82, 0); // Gravity
+world.gravity.set(0, -9.82, 0);  // Gravity
 
-// Ground in Physics and Three.js
-const groundShape = new CANNON.Plane();
-const groundBody = new CANNON.Body({ mass: 0, shape: groundShape });
-groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0); // Rotate to horizontal
+// Ground plane for physics
+const groundBody = new CANNON.Body({ mass: 0 });
+groundBody.addShape(new CANNON.Plane());
+groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
 world.addBody(groundBody);
 
-const groundMesh = new THREE.Mesh(new THREE.PlaneGeometry(1000, 1000), new THREE.MeshStandardMaterial({ color: 0x0032ff }));
+const groundMesh = new THREE.Mesh(
+  new THREE.PlaneGeometry(100, 100),
+  new THREE.MeshStandardMaterial({ color: 0x6666ff })
+);
 groundMesh.rotation.x = -Math.PI / 2;
 scene.add(groundMesh);
 
-// Load Car Model
-let carMesh = null, carBody = null;
+// Car model loading and setup
+let carMesh, carBody;
 const loader = new THREE.GLTFLoader();
+const textureLoader = new THREE.TextureLoader();
+const wheels = [];  // Array to store wheel meshes
+
 loader.load('models/car.glb', function(gltf) {
   carMesh = gltf.scene;
-
-  // Traverse the model and replace textures with a basic material
- // carMesh.traverse(function(node) {
-   // if (node.isMesh) {
-     // node.material = new THREE.MeshStandardMaterial({ color: 0x808080 });
-    //}
-  //});
-
-  carMesh.scale.set(1, 1, 1);
   scene.add(carMesh);
 
-  // Car Physics Body
-  const carShape = new CANNON.Box(new CANNON.Vec3(1, 0.5, 2)); // Approx car shape
-  carBody = new CANNON.Body({ mass: 1500, shape: carShape });
+  // Physics body for car
+  carBody = new CANNON.Body({ mass: 1500 });
+  carBody.addShape(new CANNON.Box(new CANNON.Vec3(1, 0.5, 2)));
   carBody.position.set(0, 0.5, 0);
   world.addBody(carBody);
+
+  // Locate and store wheels
+  carMesh.traverse((node) => {
+    if (node.isMesh && node.name.includes("wheel")) {
+      wheels.push(node);  // Assuming wheels have "wheel" in their names
+    }
+  });
 }, undefined, function(error) {
   console.error('An error occurred loading the model:', error);
 });
 
-// Controls (initialize after camera)
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.2;
-camera.position.set(0, 3, 10);
-
-// Keyboard Controls
+// Key input tracking
+const keys = { forward: false, backward: false, left: false, right: false };
 document.addEventListener('keydown', (event) => {
   switch (event.code) {
     case 'ArrowUp': keys.forward = true; break;
@@ -69,7 +67,6 @@ document.addEventListener('keydown', (event) => {
     case 'ArrowRight': keys.right = true; break;
   }
 });
-
 document.addEventListener('keyup', (event) => {
   switch (event.code) {
     case 'ArrowUp': keys.forward = false; break;
@@ -79,31 +76,36 @@ document.addEventListener('keyup', (event) => {
   }
 });
 
-// Update Physics and Render Loop
+// Animation loop
 function animate() {
   requestAnimationFrame(animate);
 
-  // Ensure carBody and carMesh are loaded before using them
-  if (carBody && carMesh) {
-    const force = 500;
+  // Apply physics-based movement
+  const force = 500;
+  if (carBody) {
     if (keys.forward) carBody.applyForce(new CANNON.Vec3(0, 0, -force), carBody.position);
     if (keys.backward) carBody.applyForce(new CANNON.Vec3(0, 0, force), carBody.position);
-    if (keys.left) carBody.angularVelocity.set(0, 5, 0); // Turn left
-    if (keys.right) carBody.angularVelocity.set(0, -5, 0); // Turn right
-
+    if (keys.left || keys.right) {
+      wheels.forEach(wheel => {
+        wheel.rotation.x += 0.1 * (keys.right ? -1 : 1);  // Rotate wheels left/right
+      });
+    }
+    
     carMesh.position.copy(carBody.position);
     carMesh.quaternion.copy(carBody.quaternion);
   }
 
-  world.step(1 / 60);  // Update physics
-  controls.update();   // Update controls
-  renderer.render(scene, camera);  // Render scene
+  // Render and update controls
+  world.step(1 / 60);
+  renderer.render(scene, camera);
 }
+
 animate();
 
-// Handle Window Resizing
+// Window resizing
 window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.left = -5 * aspect;
+  camera.right = 5 * aspect;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
