@@ -3,7 +3,7 @@ const scene = new THREE.Scene();
 const aspect = window.innerWidth / window.innerHeight;
 const camera = new THREE.OrthographicCamera(-5 * aspect, 5 * aspect, 5, -5, 0.1, 100);
 camera.position.set(10, 10, 10);  // Position for isometric view
-camera.lookAt(0, 0, 0);
+camera.lookAt(carMesh.position);
 
 const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#canvas') });
 renderer.setSize(window.innerWidth, window.innerHeight);
