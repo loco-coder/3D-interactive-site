@@ -3,7 +3,6 @@ const scene = new THREE.Scene();
 const aspect = window.innerWidth / window.innerHeight;
 const camera = new THREE.OrthographicCamera(-5 * aspect, 5 * aspect, 5, -5, 0.1, 100);
 camera.position.set(10, 10, 10);  // Position for isometric view
-camera.lookAt(carMesh.position);
 
 const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector('#canvas') });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -34,12 +33,14 @@ scene.add(groundMesh);
 // Car model loading and setup
 let carMesh, carBody;
 const loader = new THREE.GLTFLoader();
-const textureLoader = new THREE.TextureLoader();
 const wheels = [];  // Array to store wheel meshes
 
 loader.load('models/car.glb', function(gltf) {
   carMesh = gltf.scene;
   scene.add(carMesh);
+
+  // Focus the camera on the car once loaded
+  camera.lookAt(carMesh.position);
 
   // Physics body for car
   carBody = new CANNON.Body({ mass: 1500 });
