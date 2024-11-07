@@ -27,7 +27,7 @@ spotLight.position.set(0, 25, 0);
 scene.add(spotLight);
 
 const loader = new GLTFLoader().setPath('3D-interactive-site/millenium_falcon/');
-loader.load('scene.gltf', (_gltf_) => {
+loader.load('scene.gltf', (gltf) => {
   const mesh = gltf.scene;
   mesh.position.set(0, 1.05, -1);
   scene.add(mesh);
