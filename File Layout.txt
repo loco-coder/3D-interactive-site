@@ -1,8 +1,0 @@
-car-website/
-│
-├── index.html           # Main HTML file
-├── style.css            # Optional CSS for styling
-├── js/
-│   └── main.js          # JavaScript file for Three.js, Cannon.js, and logic
-└── models/
-    └── car.glb          # Car 3D model (GLTF format)
